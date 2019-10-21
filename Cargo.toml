@@ -1,0 +1,13 @@
+[package]
+name = "simple-web-server"
+version = "0.1.0"
+authors = ["wintermelon <returnhs@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+crossbeam-channel = "0.5.0"
+futures = "0.3.13"
+
+[dependencies.async-std]
+version = "1.9.0"
+features = ["attributes"]
