@@ -1,0 +1,12 @@
+[package]
+name = "excutor"
+version = "0.1.0"
+authors = ["hooper.hu <hooper.hu@trantect.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossbeam-channel = "0.5"
+futures = "0.3"
+atomic-waker = "1.0"
