@@ -1,4 +1,4 @@
-use atomic_waker::AtomicWaker;
+use futures::task::AtomicWaker;
 use std::{
     future::Future,
     pin::Pin,
@@ -24,10 +24,18 @@ struct SharedState {
 impl Future for TimerFuture {
     type Output = ();
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        if self.shared_state.completed.load(Ordering::Acquire) {
+        // quick check to avoid registration if already done.
+        if self.shared_state.completed.load(Ordering::Relaxed) {
+            return Poll::Ready(());
+        }
+
+        self.shared_state.waker.register(&cx.waker()); 
+
+        // Need to check condition **after** `register` to avoid a race
+        // condition that would result in lost notifications.
+        if self.shared_state.completed.load(Ordering::Relaxed) {
             Poll::Ready(())
         } else {
-            self.shared_state.waker.register(&cx.waker());
             Poll::Pending
         }
     }
@@ -42,7 +50,7 @@ impl TimerFuture {
         let thread_shared_state = shared_state.clone();
         thread::spawn(move || {
             thread::sleep(duration);
-            thread_shared_state.completed.store(true, Ordering::Release);
+            thread_shared_state.completed.store(true, Ordering::Relaxed);
             thread_shared_state.waker.wake();
         });
         TimerFuture { shared_state }

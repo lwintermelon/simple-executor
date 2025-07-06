@@ -2,11 +2,22 @@
 name = "excutor"
 version = "0.1.0"
 authors = ["hooper.hu <hooper.hu@trantect.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.test]
+split-debuginfo = "packed"
+
+[profile.dev]
+split-debuginfo = "packed"
+
+[profile.release]
+debug = "full"
+split-debuginfo = "packed"
 
 [dependencies]
 crossbeam-channel = "0.5"
 futures = "0.3"
-atomic-waker = "1.0"
+rand = "0.9.1"
+libc = "0.2"
+atomic-wait = "1"

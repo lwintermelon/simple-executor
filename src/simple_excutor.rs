@@ -1,14 +1,12 @@
-use {
-    crossbeam_channel::{unbounded, Receiver, Sender},
-    futures::{
-        future::{BoxFuture, FutureExt},
-        task::{waker_ref, ArcWake},
-    },
-    std::{
-        future::Future,
-        sync::{Arc, Mutex},
-        task::{Context, Poll},
-    },
+use crossbeam_channel::{bounded, Receiver, Sender};
+use futures::{
+    future::{BoxFuture, FutureExt},
+    task::ArcWake,
+};
+use std::{
+    future::Future,
+    sync::{Arc, Mutex},
+    task::{Context, Poll},
 };
 
 pub struct Executor {
@@ -26,7 +24,7 @@ struct Task {
 }
 
 pub fn new_executor_and_spawner() -> (Executor, Spawner) {
-    let (task_sender, ready_queue) = unbounded();
+    let (task_sender, ready_queue) = bounded(1000);
     (Executor { ready_queue }, Spawner { task_sender })
 }
 
@@ -53,7 +51,7 @@ impl Executor {
         while let Ok(task) = self.ready_queue.recv() {
             let mut future_slot = task.future.lock().unwrap();
             if let Some(mut future) = future_slot.take() {
-                let waker = waker_ref(&task);
+                let waker = futures::task::waker_ref(&task);
                 let context = &mut Context::from_waker(&*waker);
                 if let Poll::Pending = future.as_mut().poll(context) {
                     *future_slot = Some(future);

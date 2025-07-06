@@ -1,8 +1,8 @@
 pub mod simple_excutor;
 pub mod simple_future;
 
-use std::time::Duration;
 use simple_future::TimerFuture;
+use std::time::Duration;
 
 fn main() {
     println!("Hello, world!");
