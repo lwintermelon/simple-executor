@@ -18,6 +18,6 @@ split-debuginfo = "packed"
 [dependencies]
 crossbeam-channel = "0.5"
 futures = "0.3"
-rand = "0.9.1"
+rand = "0.9.3"
 libc = "0.2"
 atomic-wait = "1"
